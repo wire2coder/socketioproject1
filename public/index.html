@@ -21,7 +21,7 @@
 
     <div class="container">
 
-        <ul id="message"></ul>
+        <ul id="messages"></ul>
         <form action="">
             <input id="m" autocomplete="off" />
             <button>Submit</button>
@@ -43,6 +43,10 @@
             socket.emit('chat message', $('#m').val());
             $('#m').val('');
             return false;
+        });
+
+        socket.on('chat message', function (msg) {
+            $('#messages').append($('<li>').text(msg));
         });
 
     </script>
