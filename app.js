@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/bower_components'));
 
 
 app.get('/', function(req, res) {
@@ -16,8 +17,22 @@ app.get('/', function(req, res) {
 });
 
 io.on('connection', function (socket) {
-    console.log('a user is connected');
+    //console.log('a user is connected');
+
+    /*
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
+    });
+    */
+
+    // from the client, index.html 'chat message'
+    socket.on('chat message', function (msg) {
+        console.log('message: ' + msg);
+    });
+
 });
+
+
 
 
 
