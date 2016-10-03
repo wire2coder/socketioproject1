@@ -36,12 +36,15 @@ mongo.connect('mongodb://localhost/mongochat', function (err, db) {
 
             if(name === '' || message =='') {
                 // make user insert name and messages
-                console.log('Please fill in name and messages');
+                client.emit('status', 'Please enter a name and a message');
+
             } else {
                 // insert name and messages into MongoDB
-                chat.insert({}, function () {
-                    HERE, WORK ON INDEX.HTML
-                });
+                //chat.insert({name: name, message: message}, function () {
+                //    console.log('Server: stuff inserted');
+                //});
+
+                client.emit('output', [data])
             }
 
         });

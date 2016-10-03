@@ -3,8 +3,11 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title> MongoChat </title>
-    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap-theme.min.css">
 
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+
+    <script src="jquery/dist/jquery.min.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -13,34 +16,21 @@
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
 
-                <h1 class="text-center">Mongo Chat
+                <h1 class="text-center">MongoChat
                     <button class="btn btn-danger clearbtn">Clear</button>
                 </h1>
 
                 <div class="status"></div>
 
                 <div class="chat">
-
-                    <input type="text" class="username forn-control" placeholder="What's your Name?">
+                    <input type="text" class="username form-control" placeholder="What's your Name?">
                     <br>
                     <div class="messages well"></div>
-
-                    <textarea class="form-control" placeholder="Enter MEssage"></textarea>
-
+                    <textarea class="form-control" placeholder="Enter Message"></textarea>
                 </div>
-            </div>
-
-            <div class="col-md-6">
-
-                <ul id="ul1"></ul>
-
-                <form id="form1">
-
-
-                    <button type="submit">Sub</button>
-                </form>
 
             </div>
+
 
         </div>
     </div>
@@ -48,30 +38,61 @@
 
 <!--load the socket.io-client, which expose a io global, and then connect-->
 <script src="/socket.io/socket.io.js"></script>
-<script src="jquery/dist/jquery.min.js"></script>
-
 <script>
+    ( function() {
+        // Create SocketIO instance, and connect to the server
+        var socket = io();
 
-    $('#form1').submit(function (event) {
-        socket.emit('message', 'testing');
-    });
+        var element = function(selector) {
+            return document.querySelector(selector);
+        };
 
-    // Create SocketIO instance, and connect to the server
-    var socket = io();
+        // Get elements
+        // querySelector returns the first element in the DOM tree
+        var status = element('.status');
+        var messages = element('.messages');
+        var textarea = element('.chat textarea');
+        var username = element('.username');
+        var clearbtn = element('.clearbtn');
 
-    // Add a connect listener, socket.on receive from server
-    socket.on('message', function (data) {
-        console.log(data);
-    });
+        // Output
+        socket.on('output', function (data) {
+            if (data.length) {
+                for (var x = 0; x < data.length; x = x + 1) {
+                    var message = document.createElement('div');
+                    message.setAttribute('class', 'chat-message'); // class="chat-message"
+                    message.textContent = data[x].name + ': ' + data[x].message;
 
-    socket.on('output', function (data) {
-//        console.log(data[0].name);
-        var name = data[0].name;
-        $('.status').text(name);
-    });
+                    // Look carefully, message and messages
+                    messages.appendChild(message);
+                    messages.insertBefore(message, messages.firstChild);
+                }
+            }
+        });
 
-    // send data to the server
-    // socket.emit('message', {m1: 'kjsdfdlsf'});
+        // Keydown Event
+        textarea.addEventListener('keydown', function (event) {
+            var self = this;
+            var name = username.value;
+
+            if (event.which === 13 && event.shiftKey == false) {
+                socket.emit('input', {
+                    name: name,
+                    message: self.value
+                });
+
+                event.preventDefault();
+            }
+        });
+
+        socket.on('status', function (incomingData) {
+            $('.status').text(incomingData);
+        });
+
+    })(); //
+
+
+
 
 
 
