@@ -28,8 +28,20 @@
                     <textarea class="form-control" placeholder="Enter MEssage"></textarea>
 
                 </div>
+            </div>
+
+            <div class="col-md-6">
+
+                <ul id="ul1"></ul>
+
+                <form id="form1">
+
+
+                    <button type="submit">Sub</button>
+                </form>
 
             </div>
+
         </div>
     </div>
 
@@ -42,7 +54,6 @@
 
     $('#form1').submit(function (event) {
         socket.emit('message', 'testing');
-        $('#ul1').append($('<li>')).text('kk');
     });
 
     // Create SocketIO instance, and connect to the server
@@ -54,7 +65,9 @@
     });
 
     socket.on('output', function (data) {
-        $('.status').text('hello');
+//        console.log(data[0].name);
+        var name = data[0].name;
+        $('.status').text(name);
     });
 
     // send data to the server
