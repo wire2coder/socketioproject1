@@ -19,36 +19,29 @@
 </head>
 <body>
 
-    <div class="container">
-
-        <ul id="messages"></ul>
-        <form action="">
-            <input id="m" autocomplete="off" />
-            <button>Submit</button>
-        </form>
-
-    </div>
 
 
+<!--load the socket.io-client, which expose a io global, and then connect-->
+<script src="/socket.io/socket.io.js"></script>
+<script src="jquery/dist/jquery.min.js"></script>
+
+<script>
+    // Create SocketIO instance, and connect to the server
+    var socket = io();
+
+    // Add a connect listener, socket.on receive from server
+    socket.on('message', function (data) {
+        console.log(data);
+    });
+
+    // send data to the server
+    // socket.emit('message', {m1: 'kjsdfdlsf'});
 
 
-    <!--load the socket.io-client, which exposes a io global, and then connect.-->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="jquery/dist/jquery.min.js"></script>
 
-    <script>
 
-        var socket = io();
-        $('form').submit(function () {
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
-        });
 
-        socket.on('chat message', function (msg) {
-            $('#messages').append($('<li>').text(msg));
-        });
+</script>
 
-    </script>
 </body>
 </html>
