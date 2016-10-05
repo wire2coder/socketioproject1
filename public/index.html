@@ -9,94 +9,66 @@
     <script src="jquery/dist/jquery.min.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
 
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages li { padding: 5px 10px; }
+        #messages li:nth-child(odd) { background: #eee; }
+    </style>
+
 </head>
 <body>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
+<div class="container">
 
-                <h1 class="text-center">MongoChat
-                    <button class="btn btn-danger clearbtn">Clear</button>
-                </h1>
+    <ul id="messages"></ul>
+    <form action="">
+        <input id="u" autocomplete="off" placeholder="Name" />
+        <input id="m" autocomplete="off" placeholder="Message" />
 
-                <div class="status"></div>
+        <button type="submit">Send</button>
+    </form>
 
-                <div class="chat">
-                    <input type="text" class="username form-control" placeholder="What's your Name?">
-                    <br>
-                    <div class="messages well"></div>
-                    <textarea class="form-control" placeholder="Enter Message"></textarea>
-                </div>
-
-            </div>
-
-
-        </div>
-    </div>
+    <button class="clear">Clear</button>
+</div>
 
 
 <!--load the socket.io-client, which expose a io global, and then connect-->
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    ( function() {
-        // Create SocketIO instance, and connect to the server
-        var socket = io();
+    var socket = io();
 
-        var element = function(selector) {
-            return document.querySelector(selector);
-        };
+    $('form').submit(function () {
+        var username = $('#u').val(),
+                message = $('#m').val();
 
-        // Get elements
-        // querySelector returns the first element in the DOM tree
-        var status = element('.status');
-        var messages = element('.messages');
-        var textarea = element('.chat textarea');
-        var username = element('.username');
-        var clearbtn = element('.clearbtn');
-
-        // Output
-        socket.on('output', function (data) {
-            if (data.length) {
-                for (var x = 0; x < data.length; x = x + 1) {
-                    var message = document.createElement('div');
-                    message.setAttribute('class', 'chat-message'); // class="chat-message"
-                    message.textContent = data[x].name + ': ' + data[x].message;
-
-                    // Look carefully, message and messages
-                    messages.appendChild(message);
-                    messages.insertBefore(message, messages.firstChild);
-                }
-            }
+        socket.emit('chat message', {
+            name: username,
+            message: message
         });
 
-        // Keydown Event
-        textarea.addEventListener('keydown', function (event) {
-            var self = this;
-            var name = username.value;
+        $('#m').val('');
 
-            if (event.which === 13 && event.shiftKey == false) {
-                socket.emit('input', {
-                    name: name,
-                    message: self.value
-                });
+        return false;
+    });
 
-                event.preventDefault();
-            }
-        });
+    socket.on('chat', function (data) {
+        console.log(data);
 
-        socket.on('status', function (incomingData) {
-            $('.status').text(incomingData);
-        });
+        $('#messages').append($('<li>').text(data.name + ': ' + data.message));
+    });
 
-    })(); //
+    $('.clear').click(function () {
+        console.log('cleared');
 
+        socket.emit('clear');
+    });
 
-
-
-
-
-
+    socket.emit('pagerefresh')
 
 </script>
 
